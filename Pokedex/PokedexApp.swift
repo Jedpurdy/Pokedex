@@ -1,20 +1,29 @@
-//
-//  Pokedex2App.swift
-//  Pokedex2
-//
-//  Created by Ethan TILLIER on 2/17/25.
-//
-
 import SwiftUI
+import UserNotifications
 
 @main
 struct PokedexApp: App {
-    let persistenceController = PersistenceController.shared
+    @StateObject private var viewModel = PokemonViewModel()  // ViewModel for managing Pokémon data
+
+    init() {
+        requestNotificationPermission()  // Request permission when the app starts
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            PokemonListView()
+                .environmentObject(viewModel) // Provide the ViewModel to the PokemonListView
+        }
+    }
+
+    // Request notification permission when the app starts
+    func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                print("Permission granted for notifications.")
+            } else {
+                print("Permission denied for notifications.")
+            }
         }
     }
 }
